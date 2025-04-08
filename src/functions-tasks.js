@@ -111,8 +111,9 @@ function getPolynom(...coefficients) {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
+function memoize(func) {
+  const cache = func();
+  return () => cache;
 }
 
 /**
@@ -130,8 +131,18 @@ function memoize(/* func */) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  let at = attempts;
+  function sss() {
+    try {
+      if (!at) throw new Error('Somthin');
+      return func();
+    } catch (error) {
+      at -= 1;
+      return sss();
+    }
+  }
+  return sss;
 }
 
 /**
@@ -157,8 +168,18 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return (...arg) => {
+    const newArgs = arg
+      .map((argt) =>
+        typeof argt === 'string' ? `"${argt}"` : JSON.stringify(argt)
+      )
+      .join(',');
+    logFunc(`${func.name}(${newArgs}) starts`);
+    const a = func(...arg);
+    logFunc(`${func.name}(${newArgs}) ends`);
+    return a;
+  };
 }
 
 /**
@@ -174,8 +195,10 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  return function nu(...args2) {
+    return fn(...args1, ...args2);
+  };
 }
 
 /**
